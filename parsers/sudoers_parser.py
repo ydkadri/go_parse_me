@@ -33,10 +33,10 @@ ALIASES = (
 ALIASES_PATTERN = "^(User|Runas|Host|Cmnd)_Alias"
 
 USERS_PATTERN = (
-    "^([a-zA-Z0-9_]+)\s+" \
-    "([a-zA-Z0-9_]+)\s*=" \
-    "\s*(\(([a-zA-Z]+):?([a-zA-Z]*)\))?\s*" \
-    "(NOPASSWD:)?\s*" \
+    "^([a-zA-Z0-9_]+)\s+"
+    "([a-zA-Z0-9_]+)\s*="
+    "\s*(\(([a-zA-Z]+):?([a-zA-Z]*)\))?\s*"
+    "(NOPASSWD:)?\s*"
     "(.*)"
 )
 
@@ -97,7 +97,7 @@ def _parse_users_and_groups(lines):
         aliases = search(ALIASES_PATTERN, line)
         if aliases is not None:
             continue
-        if line.startswith('Defaults'):
+        if line.startswith("Defaults"):
             continue
         users_match = search(USERS_PATTERN, line)
         if users_match is not None:
