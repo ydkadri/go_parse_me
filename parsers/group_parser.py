@@ -2,12 +2,7 @@
 The parser for /etc/group files
 """
 
-HEADERS = (
-    "group_name",
-    "password",
-    "group_id",
-    "users",
-)
+from .constants import GROUP_HEADERS
 
 
 def parse_group(group_file, delimiter=":"):
@@ -15,6 +10,6 @@ def parse_group(group_file, delimiter=":"):
     lines = group_file.readlines()
     parsed_lines = []
     for line in lines:
-        parsed = dict(zip(HEADERS, line.strip().split(delimiter)))
+        parsed = dict(zip(GROUP_HEADERS, line.strip().split(delimiter)))
         parsed_lines.append(parsed)
     return parsed_lines
