@@ -1,5 +1,7 @@
 # Data directory for sample data
 data/
+output/
+script/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
