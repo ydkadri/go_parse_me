@@ -63,24 +63,28 @@ def _parse_users_and_groups(lines):
         "groups": [],
     }
     for line in lines:
+        if line.startswith("Defaults"):
+            continue
+
         aliases = search(SUDO_ALIASES_PATTERN, line)
         if aliases is not None:
             continue
-        if line.startswith("Defaults"):
-            continue
+
         users_match = search(SUDO_USERS_PATTERN, line)
         if users_match is not None:
             entities["users"].append(
                 dict(zip(SUDO_USERS_HEADERS, users_match.groups()))
             )
-        else:
-            groups_match = search(SUDO_GROUPS_PATTERN, line)
-            if groups_match is not None:
-                entities["groups"].append(
-                    dict(zip(SUDO_GROUPS_HEADERS, groups_match.groups()))
-                )
-            else:
-                print("CANNOT PARSE LINE:", line)
+            continue
+
+        groups_match = search(SUDO_GROUPS_PATTERN, line)
+        if groups_match is not None:
+            entities["groups"].append(
+                dict(zip(SUDO_GROUPS_HEADERS, groups_match.groups()))
+            )
+            continue
+
+        print("CANNOT PARSE LINE:", line)
 
     return entities
 
