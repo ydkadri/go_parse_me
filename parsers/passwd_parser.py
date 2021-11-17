@@ -2,15 +2,7 @@
 The parser for /etc/passwd files
 """
 
-HEADERS = (
-    "user_name",
-    "password",
-    "user_id",
-    "primary_group_id",
-    "comment",
-    "home_directory",
-    "user_shell",
-)
+from .constants import PASSWD_HEADERS
 
 
 def parse_passwd(passwd_file, delimiter=":"):
@@ -18,6 +10,6 @@ def parse_passwd(passwd_file, delimiter=":"):
     lines = passwd_file.readlines()
     parsed_lines = []
     for line in lines:
-        parsed = dict(zip(HEADERS, line.strip().split(delimiter)))
+        parsed = dict(zip(PASSWD_HEADERS, line.strip().split(delimiter)))
         parsed_lines.append(parsed)
     return parsed_lines

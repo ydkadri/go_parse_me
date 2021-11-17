@@ -21,44 +21,16 @@ User_Alias  EXCEPT_ROOT = ALL,!root
 
 from re import search
 
-COMMENT_CHAR = "#"
-EMPTY_LINE = "^$"
-
-ALIASES = (
-    "User_Alias",
-    "Runas_Alias",
-    "Host_Alias",
-    "Cmnd_Alias",
+from .constants import (
+    COMMENT_CHAR,
+    EMPTY_LINE,
+    SUDO_ALIASES_PATTERN,
+    SUDO_ALIASES_HEADERS,
+    SUDO_USERS_PATTERN,
+    SUDO_USERS_HEADERS,
+    SUDO_GROUPS_PATTERN,
+    SUDO_GROUPS_HEADERS,
 )
-ALIASES_PATTERN = "^(User|Runas|Host|Cmnd)_Alias"
-
-USERS_PATTERN = (
-    "^([a-zA-Z0-9_]+)\s+"
-    "([a-zA-Z0-9_]+)\s*="
-    "\s*(\(([a-zA-Z]+):?([a-zA-Z]*)\))?\s*"
-    "(NOPASSWD:)?\s*"
-    "(.*)"
-)
-
-USERS_HEADERS = (
-    "user",
-    "group",
-    "as",
-    "run_as_user",
-    "run_as_group",
-    "no_pass",
-    "commands",
-)
-
-GROUPS_PATTERN = (
-    "^%([a-zA-Z0-9_]+)\s+"
-    "([a-zA-Z0-9_]+)\s*="
-    "\s*(\(([a-zA-Z_]+)\))?\s*"
-    "(NOPASSWD:)?\s*"
-    "(.*)"
-)
-
-GROUPS_HEADERS = ("user", "group", "as", "run_as_user", "no_pass", "commands")
 
 
 def _get_relevant_sudoers_lines(lines):
@@ -77,14 +49,11 @@ def _get_relevant_sudoers_lines(lines):
 
 
 def _parse_sudoers_aliases(lines):
-    aliases = {alias: [] for alias in ALIASES}
+    aliases = []
     for line in lines:
-        match = search(ALIASES_PATTERN, line)
+        match = search(SUDO_ALIASES_PATTERN, line)
         if match is not None:
-            name, detail = line[match.end() :].strip().split("=")
-            aliases[match.group()].append(
-                {"name": name.strip(), "detail": detail.strip()}
-            )
+            aliases.append(dict(zip(SUDO_ALIASES_HEADERS, match.groups())))
     return aliases
 
 
@@ -94,30 +63,36 @@ def _parse_users_and_groups(lines):
         "groups": [],
     }
     for line in lines:
-        aliases = search(ALIASES_PATTERN, line)
-        if aliases is not None:
-            continue
         if line.startswith("Defaults"):
             continue
-        users_match = search(USERS_PATTERN, line)
+
+        aliases = search(SUDO_ALIASES_PATTERN, line)
+        if aliases is not None:
+            continue
+
+        users_match = search(SUDO_USERS_PATTERN, line)
         if users_match is not None:
-            entities["users"].append(dict(zip(USERS_HEADERS, users_match.groups())))
-        else:
-            groups_match = search(GROUPS_PATTERN, line)
-            if groups_match is not None:
-                entities["groups"].append(
-                    dict(zip(GROUPS_HEADERS, groups_match.groups()))
-                )
-            else:
-                print("CANNOT PARSE LINE:", line)
+            entities["users"].append(
+                dict(zip(SUDO_USERS_HEADERS, users_match.groups()))
+            )
+            continue
+
+        groups_match = search(SUDO_GROUPS_PATTERN, line)
+        if groups_match is not None:
+            entities["groups"].append(
+                dict(zip(SUDO_GROUPS_HEADERS, groups_match.groups()))
+            )
+            continue
+
+        print("CANNOT PARSE LINE:", line)
 
     return entities
 
 
-def parse_sudoers(sudoers_file, delimiter="\W "):
+def parse_sudoers(sudoers_file):
     """A parser for /etc/passwd files taking an open file objet as input"""
     lines = sudoers_file.readlines()
-    clean_lines = [line for line in _get_relevant_sudoers_lines(lines)]
+    clean_lines = list(_get_relevant_sudoers_lines(lines))
     aliases = _parse_sudoers_aliases(clean_lines)
     entities = _parse_users_and_groups(clean_lines)
     return aliases, entities
