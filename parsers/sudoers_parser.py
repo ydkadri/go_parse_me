@@ -24,8 +24,8 @@ from re import search
 from .constants import (
     COMMENT_CHAR,
     EMPTY_LINE,
-    SUDO_ALIASES,
     SUDO_ALIASES_PATTERN,
+    SUDO_ALIASES_HEADERS,
     SUDO_USERS_PATTERN,
     SUDO_USERS_HEADERS,
     SUDO_GROUPS_PATTERN,
@@ -49,14 +49,11 @@ def _get_relevant_sudoers_lines(lines):
 
 
 def _parse_sudoers_aliases(lines):
-    aliases = {alias: [] for alias in SUDO_ALIASES}
+    aliases = []
     for line in lines:
         match = search(SUDO_ALIASES_PATTERN, line)
         if match is not None:
-            name, detail = line[match.end() :].strip().split("=")
-            aliases[match.group()].append(
-                {"name": name.strip(), "detail": detail.strip()}
-            )
+            aliases.append(dict(zip(SUDO_ALIASES_HEADERS, match.groups())))
     return aliases
 
 
@@ -88,10 +85,10 @@ def _parse_users_and_groups(lines):
     return entities
 
 
-def parse_sudoers(sudoers_file, delimiter="\W "):
+def parse_sudoers(sudoers_file):
     """A parser for /etc/passwd files taking an open file objet as input"""
     lines = sudoers_file.readlines()
-    clean_lines = [line for line in _get_relevant_sudoers_lines(lines)]
+    clean_lines = list(_get_relevant_sudoers_lines(lines))
     aliases = _parse_sudoers_aliases(clean_lines)
     entities = _parse_users_and_groups(clean_lines)
     return aliases, entities

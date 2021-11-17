@@ -26,12 +26,7 @@ GROUP_HEADERS = (
 )
 
 # /etc/sudoers aliases and headers
-SUDO_ALIASES = (
-    "User_Alias",
-    "Runas_Alias",
-    "Host_Alias",
-    "Cmnd_Alias",
-)
+SUDO_ALIASES_HEADERS = ("alias", "alias_type", "alias_name", "alias_detail")
 
 SUDO_USERS_HEADERS = (
     "user",
@@ -46,20 +41,24 @@ SUDO_USERS_HEADERS = (
 SUDO_GROUPS_HEADERS = ("user", "group", "as", "run_as_user", "no_pass", "commands")
 
 # /etc/sudoers RegEx patterns
-SUDO_ALIASES_PATTERN = "^(User|Runas|Host|Cmnd)_Alias"
+SUDO_ALIASES_PATTERN = (
+    r"^((User|Runas|Host|Cmnd)_Alias)\s+"
+    r"([a-zA-Z0-9_]+)\s*="
+    r"\s*(.*)"
+)
 
 SUDO_USERS_PATTERN = (
-    "^([a-zA-Z0-9_]+)\s+"
-    "([a-zA-Z0-9_]+)\s*="
-    "\s*(\(([a-zA-Z]+):?([a-zA-Z]*)\))?\s*"
-    "(NOPASSWD:)?\s*"
-    "(.*)"
+    r"^([a-zA-Z0-9_]+)\s+"
+    r"([a-zA-Z0-9_]+)\s*="
+    r"\s*(\(([a-zA-Z]+):?([a-zA-Z]*)\))?\s*"
+    r"(NOPASSWD:)?\s*"
+    r"(.*)"
 )
 
 SUDO_GROUPS_PATTERN = (
-    "^%([a-zA-Z0-9_]+)\s+"
-    "([a-zA-Z0-9_]+)\s*="
-    "\s*(\(([a-zA-Z_]+)\))?\s*"
-    "(NOPASSWD:)?\s*"
-    "(.*)"
+    r"^%([a-zA-Z0-9_]+)\s+"
+    r"([a-zA-Z0-9_]+)\s*="
+    r"\s*(\(([a-zA-Z_]+)\))?\s*"
+    r"(NOPASSWD:)?\s*"
+    r"(.*)"
 )
