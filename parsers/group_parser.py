@@ -11,5 +11,6 @@ def parse_group(group_file, delimiter=":"):
     parsed_lines = []
     for line in lines:
         parsed = dict(zip(GROUP_HEADERS, line.strip().split(delimiter)))
-        parsed_lines.append(parsed)
+        if parsed['group_name'] != '':
+            parsed_lines.append(parsed)
     return parsed_lines
