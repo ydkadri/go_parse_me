@@ -11,6 +11,6 @@ def parse_passwd(passwd_file, delimiter=":"):
     parsed_lines = []
     for line in lines:
         parsed = dict(zip(PASSWD_HEADERS, line.strip().split(delimiter)))
-        if parsed['user_name'] != '':
+        if parsed["user_name"] != "":
             parsed_lines.append(parsed)
     return parsed_lines

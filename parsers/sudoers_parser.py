@@ -53,7 +53,12 @@ def _parse_sudoers_aliases(lines):
     for line in lines:
         match = search(SUDO_ALIASES_PATTERN, line)
         if match is not None:
-            aliases.append(dict(zip(SUDO_ALIASES_HEADERS, match.groups())))
+            alias = dict(zip(SUDO_ALIASES_HEADERS, match.groups()))
+            alias_detail = "|".join(
+                [detail.strip() for detail in alias["alias_detail"].split(",")]
+            )
+            alias["alias_detail"] = alias_detail
+            aliases.append(alias)
     return aliases
 
 
@@ -72,16 +77,22 @@ def _parse_users_and_groups(lines):
 
         users_match = search(SUDO_USERS_PATTERN, line)
         if users_match is not None:
-            entities["users"].append(
-                dict(zip(SUDO_USERS_HEADERS, users_match.groups()))
+            user = dict(zip(SUDO_USERS_HEADERS, users_match.groups()))
+            commands = "|".join(
+                [command.strip() for command in user["commands"].split(",")]
             )
+            user["commands"] = commands
+            entities["users"].append(user)
             continue
 
         groups_match = search(SUDO_GROUPS_PATTERN, line)
         if groups_match is not None:
-            entities["groups"].append(
-                dict(zip(SUDO_GROUPS_HEADERS, groups_match.groups()))
+            group = dict(zip(SUDO_GROUPS_HEADERS, groups_match.groups()))
+            commands = "|".join(
+                [command.strip() for command in group["commands"].split(",")]
             )
+            group["commands"] = commands
+            entities["groups"].append(group)
             continue
 
         print("CANNOT PARSE LINE:", line)
