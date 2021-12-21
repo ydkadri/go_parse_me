@@ -62,3 +62,9 @@ SUDO_GROUPS_PATTERN = (
     r"(NOPASSWD:)?\s*"
     r"(.*)"
 )
+
+UBUNTU_PATCH_PATTERN = (
+    r"Start-Date:\s+([0-9]{4}-[0-9]{2}-[0-9]{2})\s+([0-9]{2}:[0-9]{2}:[0-9]{2})\n"
+    r"Commandline:\s+([a-zA-Z0-9\/\s-]+)\n"
+    r"(Requested-By:\s+([a-zA-Z0-9_-]+)\s+\(([0-9]+)\)\n)?"
+)
